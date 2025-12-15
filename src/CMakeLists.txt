@@ -7,7 +7,10 @@ if(TARGET Qt6::Quick)
     add_subdirectory(quick)
 endif()
 
-# Optional: Install logging categories file
-install(FILES ksyntaxhighlighting.categories
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/qlogging-categories6
-)
+# Note: ECM would generate and install ksyntaxhighlighting.categories file
+# This is optional for logging category configuration
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ksyntaxhighlighting.categories)
+    install(FILES ksyntaxhighlighting.categories
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/qlogging-categories6
+    )
+endif()

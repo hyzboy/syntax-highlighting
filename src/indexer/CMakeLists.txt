@@ -14,7 +14,8 @@ elseif(CMAKE_CROSSCOMPILING)
         )
     endif()
     if(NOT NATIVE_PREFIX)
-        set(NATIVE_PREFIX "/usr")
+        # Use a portable fallback
+        set(NATIVE_PREFIX ${CMAKE_INSTALL_PREFIX})
     endif()
     message(STATUS "Building katehighlightingindexer against ${NATIVE_PREFIX}")
 

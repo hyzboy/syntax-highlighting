@@ -77,7 +77,7 @@ target_include_directories(KF6SyntaxHighlighting
     INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/KSyntaxHighlighting>"
 )
 
-install(TARGETS KF6SyntaxHighlighting 
+install(TARGETS KF6SyntaxHighlighting
     EXPORT KF6SyntaxHighlightingTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
