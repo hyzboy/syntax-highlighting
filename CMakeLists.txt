@@ -3,6 +3,33 @@ cmake_minimum_required(VERSION 3.16)
 set(KF_VERSION "6.22.0")
 project(KSyntaxHighlighting VERSION ${KF_VERSION})
 
+# Require C++20
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Compiler settings
+if(MSVC)
+    # Use UTF-8 for source files
+    add_compile_options(/utf-8)
+    # Enable standards-conforming preprocessor
+    add_compile_options(/Zc:preprocessor)
+    # Enable proper __cplusplus macro
+    add_compile_options(/Zc:__cplusplus)
+    # Increase warning level
+    add_compile_options(/W3)
+    # Suppress specific warnings
+    add_compile_options(/wd4251) # needs to have dll-interface
+    # Enable parallel builds
+    add_compile_options(/MP)
+else()
+    # GCC/Clang warnings
+    add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# Position independent code for shared libraries
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include(GNUInstallDirs)
 include(FeatureSummary)
 include(GenerateExportHeader)
