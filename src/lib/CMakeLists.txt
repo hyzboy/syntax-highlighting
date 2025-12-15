@@ -4,6 +4,7 @@ set_target_properties(KF6SyntaxHighlighting PROPERTIES
     VERSION     ${KSYNTAXHIGHLIGHTING_VERSION}
     SOVERSION   ${KSYNTAXHIGHLIGHTING_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
+    AUTOMOC ON
 )
 
 target_sources(KF6SyntaxHighlighting PRIVATE
@@ -27,6 +28,7 @@ target_sources(KF6SyntaxHighlighting PRIVATE
     themedata.cpp
     worddelimiters.cpp
     $<TARGET_OBJECTS:SyntaxHighlightingData>
+    ksyntaxhighlighting_logging.cpp
 )
 
 # Generate logging category header
@@ -34,10 +36,6 @@ configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/ksyntaxhighlighting_logging.h.in"
     "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_logging.h"
     @ONLY
-)
-
-target_sources(KF6SyntaxHighlighting PRIVATE
-    "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_logging.cpp"
 )
 
 generate_export_header(KF6SyntaxHighlighting
