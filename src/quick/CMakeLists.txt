@@ -2,7 +2,12 @@
 # SPDX-FileCopyrightText: 2021 Volker Krause <vkrause@kde.org>
 # SPDX-License-Identifier: BSD-3-Clause
 
-ecm_add_qml_module(kquicksyntaxhighlightingplugin URI "org.kde.syntaxhighlighting" GENERATE_PLUGIN_SOURCE VERSION 1.0)
+qt_add_qml_module(kquicksyntaxhighlightingplugin
+    URI "org.kde.syntaxhighlighting"
+    VERSION 1.0
+    PLUGIN_TARGET kquicksyntaxhighlightingplugin
+    OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/qml/org/kde/syntaxhighlighting
+)
 
 target_sources(kquicksyntaxhighlightingplugin PRIVATE
     kquicksyntaxhighlighter.cpp
@@ -13,6 +18,10 @@ target_link_libraries(kquicksyntaxhighlightingplugin PRIVATE
     Qt6::Quick
 )
 
-ecm_finalize_qml_module(kquicksyntaxhighlightingplugin DESTINATION ${KDE_INSTALL_QMLDIR})
+install(TARGETS kquicksyntaxhighlightingplugin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/qml/org/kde/syntaxhighlighting
+    RUNTIME DESTINATION ${CMAKE_INSTALL_LIBDIR}/qml/org/kde/syntaxhighlighting
+)
 
-ecm_generate_qdoc(kquicksyntaxhighlightingplugin ksyntaxhighlightingqml.qdocconf)
+# Optional: QDoc generation (requires qdoc tool)
+# add_custom_target(qdoc_qml COMMAND qdoc ksyntaxhighlightingqml.qdocconf)

@@ -3,34 +3,30 @@ cmake_minimum_required(VERSION 3.16)
 set(KF_VERSION "6.22.0")
 project(KSyntaxHighlighting VERSION ${KF_VERSION})
 
-find_package(ECM 6.21.0 REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
-
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
-include(KDEGitCommitHooks)
-
+include(GNUInstallDirs)
 include(FeatureSummary)
 include(GenerateExportHeader)
-include(ECMSetupVersion)
-include(ECMGenerateHeaders)
 include(CMakePackageConfigHelpers)
-include(ECMPoQmTools)
-include(ECMQtDeclareLoggingCategory)
-include(ECMMarkNonGuiExecutable)
-include(ECMOptionalAddSubdirectory)
-include(ECMGenerateExportHeader)
-include(ECMDeprecationSettings)
-include(ECMQmlModule)
-include(ECMGenerateQDoc)
 
+set(KSYNTAXHIGHLIGHTING_VERSION_MAJOR 6)
+set(KSYNTAXHIGHLIGHTING_VERSION_MINOR 22)
+set(KSYNTAXHIGHLIGHTING_VERSION_PATCH 0)
+set(KSYNTAXHIGHLIGHTING_VERSION ${KF_VERSION})
+set(KSYNTAXHIGHLIGHTING_SOVERSION 6)
+
+# Generate version header
 set(ksyntaxhighlighting_version_header "${CMAKE_CURRENT_BINARY_DIR}/src/lib/ksyntaxhighlighting_version.h")
-ecm_setup_version(PROJECT
-    VARIABLE_PREFIX KSYNTAXHIGHLIGHTING
-    VERSION_HEADER "${ksyntaxhighlighting_version_header}"
-    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfigVersion.cmake"
-    SOVERSION 6
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/ksyntaxhighlighting_version.h.in"
+    "${ksyntaxhighlighting_version_header}"
+    @ONLY
+)
+
+# Generate package version file
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/KF6SyntaxHighlightingConfigVersion.cmake"
+    VERSION ${KSYNTAXHIGHLIGHTING_VERSION}
+    COMPATIBILITY SameMajorVersion
 )
 
 set(EXCLUDE_DEPRECATED_BEFORE_AND_AT 0 CACHE STRING "Control the range of deprecated API excluded from the build [default=0].")
@@ -74,8 +70,7 @@ add_feature_info(FEATURE_NO_STANDARD_PATHS ${NO_STANDARD_PATHS} "Skip lookup of 
 
 #
 # Translations
-#
-ecm_install_po_files_as_qm(poqm)
+# Note: Translation support requires manual handling without ECM
 
 # tell the framework if it shall use the syntax files from the resource
 if (QRC_SYNTAX)
@@ -87,9 +82,8 @@ if (NO_STANDARD_PATHS)
     add_definitions(-DNO_STANDARD_PATHS)
 endif()
 
-ecm_set_disabled_deprecation_versions(
-    QT 6.10.0
-)
+# Set Qt deprecation warnings
+add_definitions(-DQT_DISABLE_DEPRECATED_UP_TO=0x061000)
 
 #
 # Actually build the stuff
@@ -107,7 +101,7 @@ endif()
 #
 # CMake package config file generation
 #
-set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/KF6SyntaxHighlighting")
+set(CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/KF6SyntaxHighlighting")
 
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KF6SyntaxHighlightingConfig.cmake.in"
@@ -129,14 +123,11 @@ if(TARGET KF6SyntaxHighlighting)
 endif()
 
 install(FILES "${ksyntaxhighlighting_version_header}"
-        DESTINATION "${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting"
+        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/KSyntaxHighlighting"
         COMPONENT Devel)
 
-include(ECMFeatureSummary)
-ecm_feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
 # add target to update kate-editor.org syntax page + update site
 add_custom_target(update_kate_editor_org
     COMMAND "${PERL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/utils/update-kate-editor-org.pl" "${CMAKE_SOURCE_DIR}" "${CMAKE_BINARY_DIR}")
-
-kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)
