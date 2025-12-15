@@ -153,7 +153,7 @@ if (QRC_SYNTAX)
 else()
     add_dependencies(SyntaxHighlightingData katesyntax)
     # install the syntax files as normal files into the prefix
-    install (FILES "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" ${compressedDefs} DESTINATION ${KDE_INSTALL_DATADIR}/org.kde.syntax-highlighting/syntax-bundled)
+    install (FILES "${CMAKE_CURRENT_BINARY_DIR}/index.katesyntax" ${compressedDefs} DESTINATION ${CMAKE_INSTALL_DATADIR}/org.kde.syntax-highlighting/syntax-bundled)
 endif()
 
 # set PIC to allow use in static and shared libs

@@ -4,9 +4,8 @@ set_target_properties(KF6SyntaxHighlighting PROPERTIES
     VERSION     ${KSYNTAXHIGHLIGHTING_VERSION}
     SOVERSION   ${KSYNTAXHIGHLIGHTING_SOVERSION}
     EXPORT_NAME SyntaxHighlighting
+    AUTOMOC ON
 )
-
-ecm_create_qm_loader(syntax_highlighting_QM_LOADER syntaxhighlighting6_qt)
 
 target_sources(KF6SyntaxHighlighting PRIVATE
     abstracthighlighter.cpp
@@ -28,26 +27,20 @@ target_sources(KF6SyntaxHighlighting PRIVATE
     wildcardmatcher.cpp
     themedata.cpp
     worddelimiters.cpp
-    ${syntax_highlighting_QM_LOADER}
     $<TARGET_OBJECTS:SyntaxHighlightingData>
-)
-ecm_qt_declare_logging_category(KF6SyntaxHighlighting
-    HEADER ksyntaxhighlighting_logging.h
-    IDENTIFIER KSyntaxHighlighting::Log
-    CATEGORY_NAME kf.syntaxhighlighting
-    OLD_CATEGORY_NAMES org.kde.ksyntaxhighlighting
-    DESCRIPTION "Syntax Highlighting"
-    EXPORT KSYNTAXHIGHLIGHTING
+    ksyntaxhighlighting_logging.cpp
 )
 
-ecm_generate_export_header(KF6SyntaxHighlighting
+# Generate logging category header
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/ksyntaxhighlighting_logging.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_logging.h"
+    @ONLY
+)
+
+generate_export_header(KF6SyntaxHighlighting
     BASE_NAME KSyntaxHighlighting
-    GROUP_BASE_NAME KF
-    VERSION ${KF_VERSION}
-    USE_VERSION_HEADER
-    DEPRECATED_BASE_VERSION 0
-    DEPRECATION_VERSIONS
-    EXCLUDE_DEPRECATED_BEFORE_AND_AT ${EXCLUDE_DEPRECATED_BEFORE_AND_AT}
+    EXPORT_FILE_NAME ksyntaxhighlighting_export.h
 )
 
 qt_extract_metatypes(KF6SyntaxHighlighting)
@@ -58,37 +51,47 @@ target_link_libraries(KF6SyntaxHighlighting
         Qt6::Network
 )
 
-set(Forwarding_Header_Names
-    AbstractHighlighter
-    Definition
-    DefinitionDownloader
-    FoldingRegion
-    Format
-    Repository
-    State
-    SyntaxHighlighter
-    Theme
-    WildcardMatcher
+set(SyntaxHighlighting_HEADERS
+    abstracthighlighter.h
+    definition.h
+    definitiondownloader.h
+    foldingregion.h
+    format.h
+    repository.h
+    state.h
+    syntaxhighlighter.h
+    theme.h
+    wildcardmatcher.h
 )
 
-ecm_generate_headers(CamelCase_HEADERS
-    HEADER_NAMES ${Forwarding_Header_Names}
-    REQUIRED_HEADERS SyntaxHighlighting_HEADERS
-    SHARED_PREFIX KSyntaxHighlighting
-)
+# Create CamelCase forwarding headers
+set(CamelCase_HEADERS)
+foreach(header AbstractHighlighter Definition DefinitionDownloader FoldingRegion Format Repository State SyntaxHighlighter Theme WildcardMatcher)
+    string(TOLOWER ${header} header_lower)
+    set(forwarding_header "${CMAKE_CURRENT_BINARY_DIR}/KSyntaxHighlighting/${header}")
+    file(WRITE ${forwarding_header} "#include \"${header_lower}.h\"\n")
+    list(APPEND CamelCase_HEADERS ${forwarding_header})
+endforeach()
 
 target_include_directories(KF6SyntaxHighlighting
-    INTERFACE "$<INSTALL_INTERFACE:${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting>"
+    INTERFACE "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/KSyntaxHighlighting>"
 )
 
-install(TARGETS KF6SyntaxHighlighting EXPORT KF6SyntaxHighlightingTargets ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS KF6SyntaxHighlighting
+    EXPORT KF6SyntaxHighlightingTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/KSyntaxHighlighting
+)
 
 install(FILES
     ${CamelCase_HEADERS}
     ${SyntaxHighlighting_HEADERS}
     ${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_export.h
-    DESTINATION ${KDE_INSTALL_INCLUDEDIR_KF}/KSyntaxHighlighting/KSyntaxHighlighting
+    ${CMAKE_CURRENT_BINARY_DIR}/ksyntaxhighlighting_logging.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/KSyntaxHighlighting/KSyntaxHighlighting
 )
 
-
-ecm_generate_qdoc(KF6SyntaxHighlighting ksyntaxhighlighting.qdocconf)
+# Optional: QDoc generation (requires qdoc tool)
+# add_custom_target(qdoc COMMAND qdoc ksyntaxhighlighting.qdocconf)

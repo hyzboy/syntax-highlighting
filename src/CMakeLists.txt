@@ -7,8 +7,10 @@ if(TARGET Qt6::Quick)
     add_subdirectory(quick)
 endif()
 
-ecm_qt_install_logging_categories(
-    EXPORT KSYNTAXHIGHLIGHTING
-    FILE ksyntaxhighlighting.categories
-    DESTINATION ${KDE_INSTALL_LOGGINGCATEGORIESDIR}
-)
+# Note: ECM would generate and install ksyntaxhighlighting.categories file
+# This is optional for logging category configuration
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ksyntaxhighlighting.categories)
+    install(FILES ksyntaxhighlighting.categories
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/qlogging-categories6
+    )
+endif()
